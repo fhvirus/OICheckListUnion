@@ -1,5 +1,12 @@
 import re
 
+ansiColor = [
+    '\033[0;41m',
+    '\033[0;43m',
+    '\033[0;42m',
+    '\033[0m'
+]
+
 # Status:
 # 0 - Not Available
 # 1 - Solved / Seen / Known
@@ -23,11 +30,13 @@ class Contest:
         self.problems = problems
         self.status = 2
     def __str__(self):
-        res = self.name + ' ' + self.year
+        res = ansiColor[self.status]
+        res += self.name + ' ' + self.year
         if self.Type == 1:
             res += ' Round ' + str(self.day)
         elif self.Type == 2:
             res += ' Day ' + str(self.day)
+        res += ansiColor[3]
         return res
 
 
