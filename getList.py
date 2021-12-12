@@ -3,10 +3,10 @@ import re
 import threading
 from bs4 import BeautifulSoup
 
-oichecklistIDs = [
-    "8880bb3be4f63fb3df0ba3492e221fcdf3e99ee4",
-    "f3c01fab33d4ca704dec6ff75ddfa2edf5f48447",
-]
+oichecklistIDs = []
+with open('checklistIDs.txt') as f:
+    oichecklistIDs = f.readlines()
+    oichecklistIDs = [i.strip() for i in oichecklistIDs]
 
 pages = []
 def getPage(ID):
