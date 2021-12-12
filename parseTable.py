@@ -13,13 +13,22 @@ ansiColor = [
 # 2 - Unsolved
 
 class Problem:
-    def __init__(self, ID, name, status, contest, year, day):
+    def __init__(self, ID, name, status, contest, year, Type, day):
         self.ID = ID
         self.name = name
         self.status = status
         self.contest = contest
         self.year = year
+        self.Type = Type
         self.day = day
+    def __str__(self):
+        res = '[ ' + self.contest + ' ' + str(self.year)
+        if self.Type == 1:
+            res += ' Round ' + str(self.day)
+        elif self.Type == 2:
+            res += ' Day ' + str(self.day)
+        res += ' ] ' + self.name
+        return res
 
 class Contest:
     def __init__(self, name, year, Type, day, problems):
@@ -31,7 +40,7 @@ class Contest:
         self.status = 2
     def __str__(self):
         res = ansiColor[self.status]
-        res += self.name + ' ' + self.year
+        res += self.name + ' ' + str(self.year)
         if self.Type == 1:
             res += ' Round ' + str(self.day)
         elif self.Type == 2:
@@ -50,6 +59,7 @@ def parseTable(tableRows):
         title = contest.select('td:nth-child(1) > a')[0]
         match = contestTitlePattern.findall(title.text)[0]
         contestName, contestYear = match
+        contestYear = int(contestYear)
         # print ('\033[1m')
         # print ('[ ' + contestName + ' ' + contestYear + ' ]')
         # print ('\033[0m')
@@ -87,7 +97,7 @@ def parseTable(tableRows):
             if contestType != 0:
                 day = int(problem['data-title'].split()[3].rstrip(':'))
 
-            obj = Problem(ID, name, status, contestName, contestYear, day)
+            obj = Problem(ID, name, status, contestName, contestYear, contestType, day)
             IDtoProblem[ID] = obj
 
             if current.get(day) == None:

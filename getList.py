@@ -1,5 +1,6 @@
 import requests
 import re
+import threading
 from bs4 import BeautifulSoup
 
 oichecklistIDs = [
@@ -7,11 +8,18 @@ oichecklistIDs = [
     "f3c01fab33d4ca704dec6ff75ddfa2edf5f48447",
 ]
 
-
 pages = []
-for ID in oichecklistIDs:
+def getPage(ID):
     link = "https://oichecklist.pythonanywhere.com/view/" + ID
     pages.append(requests.get(link))
+
+threads = []
+for idx, ID in enumerate(oichecklistIDs):
+    threads.append(threading.Thread(target = getPage, args = (ID, )))
+    threads[idx].start()
+
+for thread in threads:
+    thread.join()
 
 import parseTable
 import getIDs
@@ -49,3 +57,42 @@ for contestName, years in contests.items():
         for day, problems in days.items():
             row += str(problems) + ' '
         print (row)
+
+makeMashup = input('Make a mashup? (Y/n) ')
+if makeMashup == 'n' or makeMashup == 'N':
+    exit()
+
+contest = input('Which contest(s) do you prefer? (ZCK for all) ')
+allContest = (contest == 'ZCK')
+contestList = []
+if not allContest:
+    contestList = contest.split()
+
+yearRange = input('What\'s your preferred year range? (ZCK for all) ')
+allYear = (yearRange == 'ZCK')
+minYear = 0
+maxYear = 0
+if not allYear:
+    yearRange = yearRange.split()
+    minYear = int(yearRange[0])
+    maxYear = int(yearRange[1])
+
+probNum = int(input('How many problems do you want? '))
+
+import random
+unsolved = []
+for ID, problem in IDtoProblem.items():
+    if not (allContest or problem.contest in contestList):
+        continue
+    if not (allYear or (minYear <= problem.year and problem.year <= maxYear)):
+        continue
+    if problem.status == 2:
+        unsolved.append(problem)
+random.shuffle(unsolved)
+
+if probNum <= len(unsolved):
+    print ('Mashup: ')
+    for problem in unsolved[0 : probNum]:
+        print (problem)
+else:
+    print ('You\'re too strong. No more OI problems for you!')
